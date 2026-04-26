@@ -1,0 +1,12 @@
+data/raw/
+data/processed/
+results/
+logs/
+figures/
+*.zip
+*.csv
+*.jsonl
+*.json
+__pycache__/
+*.pt
+*.pyc
