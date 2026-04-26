@@ -1,0 +1,63 @@
+# ============================================================
+# vuln-transfer/configs/config.yaml
+# Central hyperparameter config for all models
+# ============================================================
+
+# --- Data ---
+data:
+  bigvul_path:   data/raw/all_c_cpp_release2.0.csv
+  devign_path:   data/raw/devign.json
+  cvefixes_path: data/raw/cvefixes_full_dataset.jsonl
+  output_dir:    data/processed
+  max_length:    512        # token truncation length (all models)
+
+# --- Training (shared defaults) ---
+training:
+  epochs:        10
+  batch_size:    16
+  learning_rate: 2.0e-5
+  weight_decay:  0.01
+  dropout:       0.3
+  patience:      3          # early stopping — epochs without val F1 improvement
+  num_workers:   2          # DataLoader workers
+
+# --- Model-specific overrides ---
+# These override the shared training defaults above for specific models.
+models:
+  codebert:
+    hf_name:       microsoft/codebert-base
+    learning_rate: 2.0e-5
+    batch_size:    16
+    epochs:        10
+
+  codet5:
+    hf_name:       Salesforce/codet5-base
+    learning_rate: 2.0e-5
+    batch_size:    16
+    epochs:        10
+
+  graphcodebert:
+    hf_name:       microsoft/graphcodebert-base
+    learning_rate: 2.0e-5
+    batch_size:    16
+    epochs:        10
+
+  bilstm:
+    hf_name:       microsoft/codebert-base  # tokenizer only
+    learning_rate: 1.0e-3
+    batch_size:    32
+    epochs:        20
+    embed_dim:     128
+    hidden_dim:    256
+    num_layers:    2
+
+# --- Evaluation ---
+evaluation:
+  batch_size:    32
+  threshold:     0.5        # decision boundary for binary classification
+
+# --- Paths ---
+paths:
+  results_dir:   results/
+  figures_dir:   figures/
+  logs_dir:      logs/
