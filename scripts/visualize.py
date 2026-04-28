@@ -1,22 +1,3 @@
-"""
-visualize.py
-------------
-Generates all figures for the paper:
-  1. AUROC curves (all 4 models, all 3 datasets)
-  2. F1/Precision/Recall comparison table (saved as CSV + figure)
-  3. CWE-type F1 breakdown bar chart
-  4. Attention weight heatmap for a selected function
-  5. Training loss/F1 curves
-
-Usage:
-    python scripts/visualize.py --results_root results/ --output_dir figures/
-
-    # Attention heatmap for a specific function
-    python scripts/visualize.py --attention \
-        --results_dir results/codebert \
-        --function_file data/sample_function.txt
-"""
-
 import argparse
 import json
 import os
@@ -31,10 +12,8 @@ from sklearn.metrics import roc_curve, auc
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# ---------------------------------------------------------------------------
-# Styling
-# ---------------------------------------------------------------------------
 
+# Styling
 MODEL_COLORS = {
     'codebert':      '#2196F3',   # blue
     'codet5':        '#4CAF50',   # green
@@ -52,7 +31,7 @@ MODEL_LABELS = {
 DATASET_LABELS = {
     'bigvul_test': 'BigVul (in-domain)',
     'devign_test': 'Devign (ext. C/C++)',
-    'd2a_test':    'D2A (Java, zero-shot)',
+    'cvefixes_test': 'CVEFixes (ext. C/C++)',
 }
 
 plt.rcParams.update({
@@ -63,14 +42,12 @@ plt.rcParams.update({
 })
 
 
-# ---------------------------------------------------------------------------
-# 1. AUROC curves
-# ---------------------------------------------------------------------------
 
+# 1. AUROC curves
 def plot_auroc_curves(results_root: str, output_dir: str):
     """One subplot per dataset, one line per model."""
     models   = ['codebert', 'codet5', 'graphcodebert', 'bilstm']
-    datasets = ['bigvul_test', 'devign_test', 'd2a_test']
+    datasets = ['bigvul_test', 'devign_test', 'cvefixes_test']
 
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 
@@ -105,14 +82,12 @@ def plot_auroc_curves(results_root: str, output_dir: str):
     print(f"  [saved] {out}")
 
 
-# ---------------------------------------------------------------------------
-# 2. F1 comparison table & figure
-# ---------------------------------------------------------------------------
 
+# 2. F1 comparison table & figure
 def plot_f1_comparison(results_root: str, output_dir: str):
     """Bar chart comparing F1 across models and datasets."""
     models   = ['codebert', 'codet5', 'graphcodebert', 'bilstm']
-    datasets = ['bigvul_test', 'devign_test', 'd2a_test']
+    datasets = ['bigvul_test', 'devign_test', 'cvefixes_test']
 
     data = {}
     for model in models:
@@ -169,10 +144,8 @@ def plot_f1_comparison(results_root: str, output_dir: str):
     print(f"  [saved] {out}")
 
 
-# ---------------------------------------------------------------------------
-# 3. CWE breakdown
-# ---------------------------------------------------------------------------
 
+# 3. CWE breakdown
 def plot_cwe_breakdown(results_root: str, output_dir: str, top_n: int = 15):
     """
     Bar chart of per-CWE F1 for the best model (codet5 or codebert — whichever you specify).
@@ -222,10 +195,8 @@ def plot_cwe_breakdown(results_root: str, output_dir: str, top_n: int = 15):
     print(f"  [saved] {out}")
 
 
-# ---------------------------------------------------------------------------
-# 4. Training curves
-# ---------------------------------------------------------------------------
 
+# 4. Training curves
 def plot_training_curves(results_root: str, output_dir: str):
     """Loss and val F1 over epochs for each model."""
     models = ['codebert', 'codet5', 'graphcodebert', 'bilstm']
@@ -259,10 +230,8 @@ def plot_training_curves(results_root: str, output_dir: str):
     print(f"  [saved] {out}")
 
 
-# ---------------------------------------------------------------------------
-# 5. Attention heatmap
-# ---------------------------------------------------------------------------
 
+# 5. Attention heatmap
 def plot_attention_heatmap(results_dir: str, function_file: str, output_dir: str):
     """
     Visualize attention weights from CodeBERT/GraphCodeBERT on a single function.
@@ -324,10 +293,8 @@ def plot_attention_heatmap(results_dir: str, function_file: str, output_dir: str
     print(f"  [saved] {out_path}")
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
+# Main
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--results_root', default='results/')

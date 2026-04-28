@@ -1,15 +1,3 @@
-"""
-preprocess.py
--------------
-Prepares BigVul, Devign, and CVEFixes datasets for vulnerability detection experiments.
-
-Usage:
-    python preprocess.py --bigvul_path   data/raw/MSR_data_cleaned.json \
-                         --devign_path   data/raw/devign.json \
-                         --cvefixes_path data/raw/cvefixes_full_dataset.jsonl \
-                         --output_dir    data/processed
-"""
-
 import argparse
 import json
 import re
@@ -18,10 +6,8 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
-# ---------------------------------------------------------------------------
-# Comment removal (C/C++/Java)
-# ---------------------------------------------------------------------------
 
+# Comment removal (C/C++/Java)
 def remove_comments(code: str) -> str:
     """Remove single-line (//) and block (/* */) comments from source code."""
     # Block comments first
@@ -33,10 +19,8 @@ def remove_comments(code: str) -> str:
     return code.strip()
 
 
-# ---------------------------------------------------------------------------
-# BigVul
-# ---------------------------------------------------------------------------
 
+# BigVul
 def load_bigvul(path: str) -> pd.DataFrame:
     """
     Load BigVul from MSR_data_cleaned.json.
@@ -83,10 +67,8 @@ def split_bigvul(df: pd.DataFrame):
     return train, val, test
 
 
-# ---------------------------------------------------------------------------
-# Devign
-# ---------------------------------------------------------------------------
 
+# Devign
 def load_devign(path: str) -> pd.DataFrame:
     """
     Load Devign JSON.
@@ -109,10 +91,8 @@ def load_devign(path: str) -> pd.DataFrame:
     return df
 
 
-# ---------------------------------------------------------------------------
-# CVEFixes
-# ---------------------------------------------------------------------------
 
+# CVEFixes
 def load_cvefixes(path: str) -> pd.DataFrame:
     """
     Load CVEFixes dataset as external C/C++ generalization test set.
@@ -146,20 +126,16 @@ def load_cvefixes(path: str) -> pd.DataFrame:
     return df
 
 
-# ---------------------------------------------------------------------------
-# Save
-# ---------------------------------------------------------------------------
 
+# Save
 def save_split(df: pd.DataFrame, path: str):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     df.to_json(path, orient='records', lines=True)
     print(f"  Saved {len(df)} records → {path}")
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
+# Main
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--bigvul_path',   required=True)

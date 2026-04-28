@@ -1,19 +1,3 @@
-"""
-evaluate.py
------------
-Evaluates a trained model checkpoint on BigVul test, Devign, and D2A.
-Also runs McNemar's significance test between two model result files.
-
-Usage:
-    # Evaluate a single model on all three test sets
-    python scripts/evaluate.py --results_dir results/codebert --data_dir data/processed
-
-    # After evaluating both, run McNemar's test
-    python scripts/evaluate.py --mcnemar \
-        --preds_a results/codebert/bigvul_test_preds.json \
-        --preds_b results/codet5/bigvul_test_preds.json
-"""
-
 import argparse
 import json
 import os
@@ -35,10 +19,8 @@ from models.bilstm import BiLSTMClassifier
 from scripts.train import TransformerClassifier, VulnDataset
 
 
-# ---------------------------------------------------------------------------
-# Inference
-# ---------------------------------------------------------------------------
 
+# Inference
 def run_inference(model, loader, device):
     """Returns (probabilities, binary predictions, true labels)."""
     model.eval()
@@ -84,10 +66,8 @@ def compute_metrics(probs, preds, labels, dataset_name: str) -> dict:
     return result
 
 
-# ---------------------------------------------------------------------------
-# CWE breakdown
-# ---------------------------------------------------------------------------
 
+# CWE breakdown
 def cwe_breakdown(preds, labels, cwe_ids, output_path: str):
     """
     Compute per-CWE F1 on BigVul test set.
@@ -112,10 +92,8 @@ def cwe_breakdown(preds, labels, cwe_ids, output_path: str):
     print(f"  CWE breakdown saved → {output_path}  ({len(rows)} CWE types)")
 
 
-# ---------------------------------------------------------------------------
-# McNemar's test
-# ---------------------------------------------------------------------------
 
+# McNemar's test
 def run_mcnemar(preds_a_path: str, preds_b_path: str):
     """
     McNemar's test comparing two models on the same test set.
@@ -156,10 +134,8 @@ def run_mcnemar(preds_a_path: str, preds_b_path: str):
     return result
 
 
-# ---------------------------------------------------------------------------
-# Load model from checkpoint
-# ---------------------------------------------------------------------------
 
+# Load model from checkpoint
 def load_model(results_dir: str, device):
     with open(os.path.join(results_dir, 'meta.json')) as f:
         meta = json.load(f)
@@ -183,10 +159,8 @@ def load_model(results_dir: str, device):
     return model, tokenizer, meta
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
+# Main
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--results_dir', default=None)

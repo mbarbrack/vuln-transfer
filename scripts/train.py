@@ -1,17 +1,3 @@
-"""
-train.py
---------
-Fine-tunes one of four models on BigVul for binary vulnerability detection.
-
-Usage:
-    python scripts/train.py --model codebert --output_dir results/codebert
-    python scripts/train.py --model codet5
-    python scripts/train.py --model graphcodebert
-    python scripts/train.py --model bilstm
-
-Supported --model values: codebert | codet5 | graphcodebert | bilstm
-"""
-
 import argparse
 import json
 import os
@@ -34,10 +20,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from models.bilstm import BiLSTMClassifier
 
 
-# ---------------------------------------------------------------------------
-# Config
-# ---------------------------------------------------------------------------
 
+# Config
 MODEL_MAP = {
     'codebert':      'microsoft/codebert-base',
     'graphcodebert': 'microsoft/graphcodebert-base',
@@ -55,10 +39,8 @@ DEFAULT_CONFIG = {
 }
 
 
-# ---------------------------------------------------------------------------
-# Dataset
-# ---------------------------------------------------------------------------
 
+# Dataset
 class VulnDataset(Dataset):
     def __init__(self, path: str, tokenizer, max_length: int):
         self.samples = []
@@ -87,10 +69,8 @@ class VulnDataset(Dataset):
         }
 
 
-# ---------------------------------------------------------------------------
-# Model wrappers
-# ---------------------------------------------------------------------------
 
+# Model wrappers
 class TransformerClassifier(nn.Module):
     """
     Wraps CodeBERT / GraphCodeBERT / CodeT5 with a shared classification head:
@@ -129,10 +109,8 @@ class TransformerClassifier(nn.Module):
         return self.classifier(pooled).squeeze(-1)    # (B,)
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 
+# Helpers
 def compute_pos_weight(train_path: str, device) -> torch.Tensor:
     """
     Compute pos_weight for BCELoss to handle class imbalance.
@@ -167,10 +145,8 @@ def evaluate(model, loader, device):
     return f1, pre, rec
 
 
-# ---------------------------------------------------------------------------
-# Main training loop
-# ---------------------------------------------------------------------------
 
+# Main training loop
 def train(args):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"[train] Device: {device}")
@@ -194,8 +170,8 @@ def train(args):
     train_ds = VulnDataset(f'{data_dir}/bigvul_train.jsonl', tokenizer, cfg['max_length'])
     val_ds   = VulnDataset(f'{data_dir}/bigvul_val.jsonl',   tokenizer, cfg['max_length'])
 
-    train_loader = DataLoader(train_ds, batch_size=cfg['batch_size'], shuffle=True,  num_workers=2)
-    val_loader   = DataLoader(val_ds,   batch_size=cfg['batch_size'], shuffle=False, num_workers=2)
+    train_loader = DataLoader(train_ds, batch_size=cfg['batch_size'], shuffle=True,  num_workers=0)
+    val_loader   = DataLoader(val_ds,   batch_size=cfg['batch_size'], shuffle=False, num_workers=0)
 
     # Model
     if is_bilstm:
@@ -281,10 +257,8 @@ def train(args):
     print(f"  Outputs saved to: {args.output_dir}")
 
 
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
 
+# CLI
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model',      required=True,
